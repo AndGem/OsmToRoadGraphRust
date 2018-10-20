@@ -1,0 +1,30 @@
+allowed_highways:
+  - pedestrian: "primary, secondary, tertiary, unclassified, residential, service, primary_link, secondary_link, tertiary_link, living_street, pedestrian, track, road, footway, steps, path"
+  - bicycle: "primary, secondary, tertiary, unclassified, residential, service, primary_link, secondary_link, tertiary_link, living_street, track, road, path, cycleway"
+  - car: "motorway, trunk, primary, secondary, tertiary, unclassified, residential, service, motorway_link, trunk_link, primary_link, secondary_link, tertiary_link, living_street"
+
+default_walking_speed: 5
+
+max_speed:
+  - unknown: 5
+  - motorway: 120
+  - trunk: 120
+  - primary: 100
+  - secondary: 100
+  - tertiary: 70
+  - unclassified: 50
+  - residential: 30
+  - service: 10
+  - motorway_link: 60
+  - trunk_link: 60
+  - primary_link: 60
+  - secondary_link: 60
+  - tertiary_link: 35
+  - living_street: 5
+  - pedestrian: 5
+  - track: 5
+  - road: 5
+  - footway: 5
+  - steps: 5
+  - path: 5
+  - cycleway: 5
