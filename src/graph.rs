@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Copy, Clone)]
 pub struct GraphNodeId(pub u32);
 
@@ -9,11 +11,24 @@ pub struct NodeData {
     pub lon: f64,
 }
 
+impl fmt::Display for NodeData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:.6} {:.6}", self.lat, self.lon)
+    }
+}
+
 pub struct EdgeData {
     pub name: String,
     pub street_type: String,
     pub max_speed: u8,
     pub bidirectional: bool,
+}
+
+impl fmt::Display for EdgeData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let dir = if self.bidirectional { 1 } else { 0 };
+        write!(f, "{} {} {}", self.street_type, self.max_speed, dir)
+    }
 }
 
 pub struct GraphNode<T> {
@@ -22,7 +37,13 @@ pub struct GraphNode<T> {
     out_edges: Vec<GraphEdgeId>,
 }
 
-impl<T> GraphNode<T> {
+impl<T: fmt::Display> fmt::Display for GraphNode<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {}", self.id.0, self.data.to_string())
+    }
+}
+
+impl<T: fmt::Display> GraphNode<T> {
     pub fn add_edge(&mut self, id: GraphEdgeId) {
         self.out_edges.push(id);
     }
@@ -39,12 +60,18 @@ pub struct GraphEdge<T> {
     pub data: T,
 }
 
-pub struct Graph<NodeData, EdgeData> {
+impl<T: fmt::Display> fmt::Display for GraphEdge<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {} {}", self.s.0, self.t.0, self.data.to_string())
+    }
+}
+
+pub struct Graph<NodeData: fmt::Display, EdgeData: fmt::Display> {
     pub nodes: Vec<GraphNode<NodeData>>,
     pub edges: Vec<GraphEdge<EdgeData>>,
 }
 
-impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
+impl<NodeData: fmt::Display, EdgeData: fmt::Display> Graph<NodeData, EdgeData> {
 
     pub fn add_node(&mut self, node_data: NodeData) -> GraphNodeId {
         let node_id = GraphNodeId(self.nodes.len() as u32);
