@@ -2,19 +2,20 @@ extern crate osmpbfreader;
 extern crate yaml_rust;
 
 mod config;
+mod config_creator;
 mod graph;
 mod osm_convert;
 mod output;
 mod read_osm;
 mod util;
 
-use config::Config;
 
 fn main() {
     let args: Vec<_> = std::env::args_os().collect();
     match args.len() {
         2 => {
-            let mut config = Config::new();
+            let filename = "../../src/config.yaml";
+            let config = config_creator::create_config_from_file(filename.to_string());
 
             let (nodes, ways) = read_osm::read_osm(&args[1], &config);
             let graph = osm_convert::convert(nodes, ways, &config);
