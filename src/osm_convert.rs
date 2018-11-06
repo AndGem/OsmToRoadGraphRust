@@ -90,3 +90,14 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
         return config.default_speed(street_type);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use config;
+
+    #[test]
+    fn it_works() {
+        // let mut config = config::Config::new();
+        assert!(1 == 1);
+    }
+}
