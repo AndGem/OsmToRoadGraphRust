@@ -53,7 +53,7 @@ pub fn convert(
     g
 }
 
-fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Config,) -> u8 {
+fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Config) -> u8 {
     if speed.is_none() {
         return config.default_speed(street_type);
     }
@@ -92,12 +92,28 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
 }
 
 #[cfg(test)]
-mod tests {
-    use config;
+use std::collections::HashSet;
 
-    #[test]
-    fn it_works() {
-        // let mut config = config::Config::new();
-        assert!(1 == 1);
-    }
+#[test]
+fn it_works() {
+    let highway: String = "barfoo".to_string();
+    let highway_speed: u8 = 23;
+    //
+    let mut max_speed: HashMap<String, u8> = HashMap::new();
+    max_speed.insert(highway.to_owned(), highway_speed);
+    //
+    let default_walking_speed: u8 = 12;
+    //
+    let mut allowed_highways_map = HashMap::new();
+    let mut allowed_highways = HashSet::new();
+    allowed_highways.insert(highway.to_owned());
+
+    let config = config::Config::new(allowed_highways_map, max_speed, default_walking_speed);
+    //
+    let speed = None;
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == highway_speed);
 }
