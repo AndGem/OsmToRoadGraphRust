@@ -75,7 +75,6 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
         let value = digits.parse::<f64>().unwrap() * fac;
         return value as u8;
     } else if speed_info.contains("kph")
-        || speed_info.contains("kp/h")
         || speed_info.contains("kmh")
         || speed_info.contains("km/h")
     {
@@ -95,7 +94,105 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
 use std::collections::HashSet;
 
 #[test]
-fn it_works() {
+fn should_return_default_speed_for_highway_when_speed_is_none() {
+    let (config, highway, highway_speed, _default_walking_speed) = create_config();
+
+    let speed = None;
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == highway_speed);
+}
+
+#[test]
+fn should_return_default_default_walking_speed_when_speed_is_walk() {
+    let (config, highway, _highway_speed, default_walking_speed) = create_config();
+
+    let speed_str = "walk".to_string();
+    let speed = Some(&speed_str);
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == default_walking_speed);
+}
+
+#[test]
+fn should_return_default_default_highway_speed_when_contains_none() {
+    let (config, highway, highway_speed, _default_walking_speed) = create_config();
+
+    let speed_str = "none".to_string();
+    let speed = Some(&speed_str);
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == highway_speed);
+}
+
+#[test]
+fn should_return_mph_speed() {
+    let (config, highway, _highway_speed, _default_walking_speed) = create_config();
+
+    let speed_str = "10 mph".to_string();
+    let speed = Some(&speed_str);
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+    let lower_bound = (10.0 * 1.60) as u8;
+    let upper_bound = (10.0 * 1.61) as u8;
+
+    assert!(result >= lower_bound);
+    assert!(result <= upper_bound);
+}
+
+#[test]
+fn should_return_kmh_speed() {
+    let (config, highway, _highway_speed, _default_walking_speed) = create_config();
+
+    let kmhs = ["kmh", "km/h", "kph"];
+    let speed_str = "123";
+    for s in kmhs.iter() {
+        let speed_str = speed_str.to_string() + s;
+        let speed = Some(&speed_str);
+        let street_type: String = highway.to_owned();
+
+        let result: u8 = parse_speed(speed, &street_type, &config);
+
+        assert!(result == 123);
+    }
+}
+
+#[test]
+fn should_return_speed() {
+    let (config, highway, _highway_speed, _default_walking_speed) = create_config();
+
+    let speed_str = "22".to_string();
+    let speed = Some(&speed_str);
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == 22);
+}
+
+#[test]
+fn should_return_default_speed_if_garbage() {
+    let (config, highway, highway_speed, _default_walking_speed) = create_config();
+
+    let speed_str = "garbage".to_string();
+    let speed = Some(&speed_str);
+    let street_type: String = highway.to_owned();
+
+    let result: u8 = parse_speed(speed, &street_type, &config);
+
+    assert!(result == highway_speed);
+}
+
+
+#[cfg(test)]
+fn create_config() -> (config::Config, String, u8, u8) {
     let highway: String = "barfoo".to_string();
     let highway_speed: u8 = 23;
     //
@@ -104,16 +201,10 @@ fn it_works() {
     //
     let default_walking_speed: u8 = 12;
     //
-    let mut allowed_highways_map = HashMap::new();
     let mut allowed_highways = HashSet::new();
     allowed_highways.insert(highway.to_owned());
 
-    let config = config::Config::new(allowed_highways_map, max_speed, default_walking_speed);
-    //
-    let speed = None;
-    let street_type: String = highway.to_owned();
-
-    let result: u8 = parse_speed(speed, &street_type, &config);
-
-    assert!(result == highway_speed);
+    let config = config::Config::new(HashMap::new(), max_speed, default_walking_speed);
+    
+    return (config, highway, highway_speed, default_walking_speed);
 }
