@@ -89,7 +89,7 @@ fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>,
     (nodes, ways)
 }
 
-pub fn read_osm(filename: &std::ffi::OsStr, config: &config::Config) -> (HashMap<NodeId, Node>, Vec<Way>) {
+pub fn read_osm(filename: &String, config: &config::Config) -> (HashMap<NodeId, Node>, Vec<Way>) {
     let file_reference = std::fs::File::open(&std::path::Path::new(filename)).unwrap();
     let (nodes, ways) = read_nodes_and_ways(file_reference);
     filter_nodes_and_ways(nodes, ways, config)
