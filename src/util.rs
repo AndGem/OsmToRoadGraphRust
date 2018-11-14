@@ -12,3 +12,11 @@ fn digit_test() {
   println!("{}", result);
   assert!(result == "8522");
 }
+
+#[test]
+fn char_test() {
+  let s = "abcdef".to_string();
+  let result = keep_characters(&s, "fbd");
+  println!("{}", result);
+  assert!(result == "bdf");
+}
