@@ -90,6 +90,9 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
     }
 }
 
+//
+// TESTS
+//
 #[cfg(test)]
 use std::collections::HashSet;
 
