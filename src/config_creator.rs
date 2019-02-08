@@ -9,7 +9,11 @@ pub fn create_config_from_file(filename: String) -> config::Config {
     let mut file_content = String::new();
     file.read_to_string(&mut file_content).unwrap();
 
-    let docs = YamlLoader::load_from_str(&file_content).unwrap();
+    create_config_from_string(file_content)
+}
+
+pub fn create_config_from_string(config: String) -> config::Config {
+    let docs = YamlLoader::load_from_str(&config).unwrap();
     let doc = &docs[0];
 
     let allowed_highways = parse_allowed_highways(doc);

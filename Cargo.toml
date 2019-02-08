@@ -6,6 +6,7 @@ version = "0.0.1"
 [dependencies]
 osmpbfreader = "0.12.0"
 yaml-rust = "0.4"
+clap = "~2.32"
 
 
 [build-dependencies]
