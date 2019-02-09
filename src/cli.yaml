@@ -1,0 +1,31 @@
+name: OSM to Road Graph (Rust)
+version: "0.1"
+about: "Converts OSM PBF files to a simple graph format."
+args:
+  - config:
+      long: config
+      help: Sets a custom config file
+      takes_value: true
+  - input:
+      help: Sets the input osm pbf file to use
+      required: true
+      index: 1
+  - network:
+      help: allowed network types are (p)edestrian, (b)icycle, (c)ar"
+      short: n
+      long: network-type
+      default_value: p
+      possible_values: [p, b, c]
+      takes_value: true
+  - nollc:
+      help: do not compute only largest connected component
+      short: l
+      long: nollc
+  - contract:
+      help: compute also graph with contracted deg 2 nodes
+      short: c
+      long: contract
+  - verbose:
+      help: enable verbose output
+      short: v
+      long: verbose

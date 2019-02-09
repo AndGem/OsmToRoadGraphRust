@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::Instant;
 
 use config;
 use graph::{EdgeData, Graph, NodeData};
@@ -10,6 +11,8 @@ pub fn convert(
     ways: Vec<Way>,
     config: &config::Config,
 ) -> Graph<NodeData, EdgeData> {
+    let now = Instant::now();
+
     let mut g: Graph<NodeData, EdgeData> = Graph {
         nodes: Vec::new(),
         edges: Vec::new(),
@@ -48,8 +51,14 @@ pub fn convert(
         g.add_edge(s, t, data, bidirectional);
     }
 
-    println!("{} edges", g.edges.len());
-    println!("{} nodes", g.nodes.len());
+    println!(
+        "converted to a graph with {} edges and {} nodes: {}s",
+        g.edges.len(),
+        g.nodes.len(),
+        now.elapsed().as_secs()
+    );
+    println!();
+
     g
 }
 
@@ -90,9 +99,7 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
     }
 }
 
-//
 // TESTS
-//
 #[cfg(test)]
 use std::collections::HashSet;
 

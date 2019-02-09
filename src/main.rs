@@ -1,7 +1,10 @@
+#[macro_use]
 extern crate clap;
 extern crate osmpbfreader;
+#[macro_use]
+extern crate lazy_static;
 extern crate yaml_rust;
-use clap::{App, Arg};
+use clap::App;
 
 mod config;
 mod config_creator;
@@ -11,55 +14,32 @@ mod output;
 mod read_osm;
 mod util;
 
+//TODO: use this block to initialize a configuration object
+lazy_static! {
+    static ref VERBOSE: bool = {
+        let yaml = load_yaml!("cli.yaml");
+        let arg_matches = App::from_yaml(yaml).get_matches();
+        arg_matches.is_present("verbose")
+    };
+}
+
 fn main() {
-    let matches = App::new("OSM to Road Graph (Rust)")
-        .version("0.1")
-        .about("Converts OSM PBF files to a simple graph format.")
-        .arg(
-            Arg::with_name("config")
-                .short("c")
-                .long("config")
-                .value_name("FILE")
-                .help("Sets a custom config file")
-                .takes_value(true),
-        ).arg(
-            Arg::with_name("OSM .pbf file")
-                .help("Sets the input osm pbf file to use")
-                .required(true)
-                .index(1),
-        ).arg(
-            Arg::with_name("network")
-                .help("network type: (p)edestrian, (b)icycle, (c)ar")
-                .short("-n")
-                .long("networkType")
-                .default_value("p")
-                .possible_values(&["p", "b", "c"])
-                .takes_value(true),
-        ).arg(
-            Arg::with_name("nollc")
-                .help("do not compute only largest connected component")
-                .short("-l")
-                .long("nollc"),
-        ).arg(
-            Arg::with_name("contract")
-                .help("compute also graph with contracted deg 2 nodes")
-                .short("-c")
-                .long("contract"),
-        ).get_matches();
+    let yaml = load_yaml!("cli.yaml");
+    let arg_matches = App::from_yaml(yaml).get_matches();
 
     let default_config_str = include_str!("config.yaml");
     let default_config = config_creator::create_config_from_string(default_config_str.to_owned());
-    let config = matches
+    let config = arg_matches
         .value_of("config")
         .map_or(default_config, |input_file| {
             config_creator::create_config_from_file(input_file.to_owned())
         });
-    let network_type = matches.value_of("network").unwrap();
-    let no_llc = matches.is_present("nollc");
-    let contract = matches.is_present("contract");
+    let network_type = arg_matches.value_of("network").unwrap();
+    let no_llc = arg_matches.is_present("nollc");
+    let contract = arg_matches.is_present("contract");
 
     //process
-    let in_filename = matches.value_of("OSM .pbf file").unwrap();
+    let in_filename = arg_matches.value_of("input").unwrap();
     let (nodes, ways) = read_osm::read_osm(&in_filename.to_owned(), &config);
     let graph = osm_convert::convert(nodes, ways, &config);
 
@@ -84,6 +64,7 @@ fn main() {
     // - compute LLC
     // - compute contraction
     // - add code coverage
-    // - add clap config to external yaml
     // - rename config to something like osm (road) parse config / osm convert config
+    // - add README.MD
+    // - add verbose to => printing
 }
