@@ -66,7 +66,7 @@ fn main() {
         Ok(_) => (),
         Err(y) => println!("ERROR: {}", y),
     };
-    println!("writing street names to {}", out_filename);
+    println!("writing street names to {}", out_filename_names);
     let output_result = output::write_names(&graph, out_filename_names);
     match output_result {
         Ok(_) => (),
@@ -75,9 +75,7 @@ fn main() {
 
     //TODO:
     // - compute LLC
-    // - output filename depending on the network type
     // - compute contraction
-    // - 64bit prec for float necessary?
     // - add code coverage
     // - add clap config to external yaml
     // - rename config to something like osm (road) parse config / osm convert config

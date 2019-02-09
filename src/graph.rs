@@ -1,5 +1,3 @@
-use std::fmt;
-
 #[derive(Debug, Copy, Clone)]
 pub struct GraphNodeId(pub u32);
 
@@ -41,7 +39,7 @@ pub trait EdgeDataAccess {
 }
 
 pub struct NodeData {
-    pub lat: f64, //TODO: not sure 64bit is necessary for precision here (and for lon)
+    pub lat: f64,
     pub lon: f64,
 }
 
@@ -51,7 +49,7 @@ impl NodeDataAccess for NodeData {
     }
 }
 
-pub struct EdgeData { //TODO: pub necessary?
+pub struct EdgeData {
     pub name: String,
     pub street_type: String,
     pub max_speed: u8,
