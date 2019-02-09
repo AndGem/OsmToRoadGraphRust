@@ -1,19 +1,51 @@
-use std::fmt;
-
 #[derive(Debug, Copy, Clone)]
 pub struct GraphNodeId(pub u32);
 
 #[derive(Debug, Copy, Clone)]
 pub struct GraphEdgeId(pub u32);
 
+pub struct GraphNode<T> {
+    pub id: GraphNodeId,
+    pub data: T,
+    out_edges: Vec<GraphEdgeId>,
+}
+
+pub struct GraphEdge<T> {
+    pub id: GraphEdgeId,
+    pub s: GraphNodeId,
+    pub t: GraphNodeId,
+    pub data: T,
+}
+
+pub trait GraphEdgeFormat {
+    fn description(&self) -> String;
+}
+
+pub struct Graph<NodeData: NodeDataAccess, EdgeData: EdgeDataAccess> {
+    pub nodes: Vec<GraphNode<NodeData>>,
+    pub edges: Vec<GraphEdge<EdgeData>>,
+}
+
+pub trait NodeDataAccess {
+    fn description(&self) -> String;
+}
+
+pub trait EdgeDataAccess {
+    fn name(&self) -> String {
+        "".to_string()
+    }
+
+    fn description(&self) -> String;
+}
+
 pub struct NodeData {
-    pub lat: f64, //TODO: not sure 64bit is necessary for precision here (and for lon)
+    pub lat: f64,
     pub lon: f64,
 }
 
-impl fmt::Display for NodeData {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:.6} {:.6}", self.lat, self.lon)
+impl NodeDataAccess for NodeData {
+    fn description(&self) -> String {
+        format!("{:.6} {:.6}", self.lat, self.lon)
     }
 }
 
@@ -24,26 +56,18 @@ pub struct EdgeData {
     pub bidirectional: bool,
 }
 
-impl fmt::Display for EdgeData {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl EdgeDataAccess for EdgeData {
+    fn name(&self) -> String {
+        return self.name.to_owned();
+    }
+
+    fn description(&self) -> String {
         let dir = if self.bidirectional { 1 } else { 0 };
-        write!(f, "{} {} {}", self.street_type, self.max_speed, dir)
+        format!("{} {} {}", self.street_type, self.max_speed, dir)
     }
 }
 
-pub struct GraphNode<T> {
-    pub id: GraphNodeId,
-    pub data: T,
-    out_edges: Vec<GraphEdgeId>,
-}
-
-impl<T: fmt::Display> fmt::Display for GraphNode<T> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {}", self.id.0, self.data.to_string())
-    }
-}
-
-impl<T: fmt::Display> GraphNode<T> {
+impl<T: NodeDataAccess> GraphNode<T> {
     pub fn add_edge(&mut self, id: GraphEdgeId) {
         self.out_edges.push(id);
     }
@@ -53,25 +77,13 @@ impl<T: fmt::Display> GraphNode<T> {
     }
 }
 
-pub struct GraphEdge<T> {
-    pub id: GraphEdgeId,
-    pub s: GraphNodeId,
-    pub t: GraphNodeId,
-    pub data: T,
-}
-
-impl<T: fmt::Display> fmt::Display for GraphEdge<T> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} {}", self.s.0, self.t.0, self.data.to_string())
+impl<T: EdgeDataAccess> GraphEdgeFormat for GraphEdge<T> {
+    fn description(&self) -> String {
+        format!("{} {} {}", self.s.0, self.t.0, self.data.description())
     }
 }
 
-pub struct Graph<NodeData: fmt::Display, EdgeData: fmt::Display> {
-    pub nodes: Vec<GraphNode<NodeData>>,
-    pub edges: Vec<GraphEdge<EdgeData>>,
-}
-
-impl<NodeData: fmt::Display, EdgeData: fmt::Display> Graph<NodeData, EdgeData> {
+impl<NodeData: NodeDataAccess, EdgeData: EdgeDataAccess> Graph<NodeData, EdgeData> {
 
     pub fn add_node(&mut self, node_data: NodeData) -> GraphNodeId {
         let node_id = GraphNodeId(self.nodes.len() as u32);
