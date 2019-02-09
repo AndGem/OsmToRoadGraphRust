@@ -21,7 +21,7 @@ pub trait GraphEdgeFormat {
     fn description(&self) -> String;
 }
 
-pub struct Graph<NodeData: NodeDataAccess, EdgeData: EdgeDataAccess> {
+pub struct Graph<NodeData, EdgeData> {
     pub nodes: Vec<GraphNode<NodeData>>,
     pub edges: Vec<GraphEdge<EdgeData>>,
 }
@@ -67,7 +67,7 @@ impl EdgeDataAccess for EdgeData {
     }
 }
 
-impl<T: NodeDataAccess> GraphNode<T> {
+impl<T> GraphNode<T> {
     pub fn add_edge(&mut self, id: GraphEdgeId) {
         self.out_edges.push(id);
     }
@@ -83,7 +83,7 @@ impl<T: EdgeDataAccess> GraphEdgeFormat for GraphEdge<T> {
     }
 }
 
-impl<NodeData: NodeDataAccess, EdgeData: EdgeDataAccess> Graph<NodeData, EdgeData> {
+impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
     pub fn add_node(&mut self, node_data: NodeData) -> GraphNodeId {
         let node_id = GraphNodeId(self.nodes.len() as u32);
         let new_node = GraphNode {
