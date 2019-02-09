@@ -65,6 +65,6 @@ fn main() {
     // - compute contraction
     // - add code coverage
     // - rename config to something like osm (road) parse config / osm convert config
-    // - add README.MD
-    // - add verbose to => printing
+    // - fill README.MD
+    // - [output] add a header to the output
 }
