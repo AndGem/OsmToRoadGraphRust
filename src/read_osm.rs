@@ -1,4 +1,3 @@
-
 use osmpbfreader::{Node, NodeId, Way};
 use std::collections::HashMap;
 use std::time::Instant;

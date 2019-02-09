@@ -193,7 +193,6 @@ fn should_return_default_speed_if_garbage() {
     assert!(result == highway_speed);
 }
 
-
 #[cfg(test)]
 fn create_config() -> (config::Config, String, u8, u8) {
     let highway: String = "barfoo".to_string();
@@ -208,6 +207,6 @@ fn create_config() -> (config::Config, String, u8, u8) {
     allowed_highways.insert(highway.to_owned());
 
     let config = config::Config::new(HashMap::new(), max_speed, default_walking_speed);
-    
+
     return (config, highway, highway_speed, default_walking_speed);
 }

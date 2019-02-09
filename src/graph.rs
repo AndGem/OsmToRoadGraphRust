@@ -84,7 +84,6 @@ impl<T: EdgeDataAccess> GraphEdgeFormat for GraphEdge<T> {
 }
 
 impl<NodeData: NodeDataAccess, EdgeData: EdgeDataAccess> Graph<NodeData, EdgeData> {
-
     pub fn add_node(&mut self, node_data: NodeData) -> GraphNodeId {
         let node_id = GraphNodeId(self.nodes.len() as u32);
         let new_node = GraphNode {
