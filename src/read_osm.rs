@@ -45,8 +45,11 @@ fn filter_nodes_and_ways(
             ways_filtered.push(way);
         }
     }
-    println!("{}s", now.elapsed().as_secs());
 
+    println!(
+        "filtered unnecessary nodes and ways: {}s",
+        now.elapsed().as_secs()
+    );
     println!(
         "#nodes now: {}/{} ({:.2}%)",
         nodes_filtered.len(),
@@ -59,6 +62,7 @@ fn filter_nodes_and_ways(
         ways_initially,
         ways_filtered.len() as f64 / ways_initially as f64 * 100.0
     );
+    println!();
 
     return (nodes_filtered, ways_filtered);
 }
@@ -81,9 +85,13 @@ fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>,
             _ => {}
         }
     }
-    println!("{}s", now.elapsed().as_secs());
-    println!("{} ways", ways.len());
-    println!("{} nodes", nodes.len());
+
+    println!("finished reading of osm data: {}s", now.elapsed().as_secs());
+    println!(
+        "data contains: {} ways, and {} nodes",
+        ways.len(),
+        nodes.len()
+    );
 
     (nodes, ways)
 }
