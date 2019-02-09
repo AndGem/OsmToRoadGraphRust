@@ -1,9 +1,9 @@
 use graph;
 
+use graph::{EdgeDataAccess, GraphEdgeFormat, NodeDataAccess};
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use graph::{NodeDataAccess, EdgeDataAccess, GraphEdgeFormat};
 
 pub fn write<TN: NodeDataAccess, TE: EdgeDataAccess>(
     g: &graph::Graph<TN, TE>,

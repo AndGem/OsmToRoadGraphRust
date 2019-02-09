@@ -12,7 +12,6 @@ impl Config {
         max_speed: HashMap<String, u8>,
         default_walking_speed: u8,
     ) -> Config {
-
         Config {
             allowed_highways: allowed_highways,
             max_speed: max_speed,
