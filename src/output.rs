@@ -1,22 +1,36 @@
 use graph;
 
-use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use graph::{NodeDataAccess, EdgeDataAccess, GraphEdgeFormat};
 
-pub fn write<TN: fmt::Display, TE: fmt::Display>(
-    g: graph::Graph<TN, TE>,
+pub fn write<TN: NodeDataAccess, TE: EdgeDataAccess>(
+    g: &graph::Graph<TN, TE>,
     filename: String,
 ) -> Result<(), io::Error> {
     let mut f = File::create(filename)?;
-    for node in g.nodes {
-        f.write(node.to_string().as_bytes())?;
+    for node in &g.nodes {
+        f.write(node.data.description().as_bytes())?;
         f.write(b"\n")?;
     }
 
-    for edge in g.edges {
-        f.write(edge.to_string().as_bytes())?;
+    for edge in &g.edges {
+        f.write(edge.description().as_bytes())?;
+        f.write(b"\n")?;
+    }
+
+    Ok(())
+}
+
+pub fn write_names<TN: NodeDataAccess, TE: EdgeDataAccess>(
+    g: &graph::Graph<TN, TE>,
+    filename: String,
+) -> Result<(), io::Error> {
+    let mut f = File::create(filename)?;
+
+    for edge in &g.edges {
+        f.write(edge.data.name().as_bytes())?;
         f.write(b"\n")?;
     }
 
