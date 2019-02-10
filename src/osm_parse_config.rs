@@ -1,18 +1,18 @@
 use std::collections::{HashMap, HashSet};
 
-pub struct Config {
+pub struct OSMParseConfig {
     allowed_highways: HashMap<String, HashSet<String>>,
     max_speed: HashMap<String, u8>,
     default_walking_speed: u8,
 }
 
-impl Config {
+impl OSMParseConfig {
     pub fn new(
         allowed_highways: HashMap<String, HashSet<String>>,
         max_speed: HashMap<String, u8>,
         default_walking_speed: u8,
-    ) -> Config {
-        Config {
+    ) -> OSMParseConfig {
+        OSMParseConfig {
             allowed_highways: allowed_highways,
             max_speed: max_speed,
             default_walking_speed: default_walking_speed,

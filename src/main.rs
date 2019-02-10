@@ -6,13 +6,13 @@ extern crate lazy_static;
 extern crate yaml_rust;
 use clap::App;
 
-mod config;
-mod config_creator;
 mod graph;
 mod graph_data;
 mod osm_convert;
+mod osm_parse_config;
+mod osm_parse_config_creator;
+mod osm_reader;
 mod output;
-mod read_osm;
 mod util;
 
 //TODO: use this block to initialize a configuration object
@@ -29,11 +29,12 @@ fn main() {
     let arg_matches = App::from_yaml(yaml).get_matches();
 
     let default_config_str = include_str!("config.yaml");
-    let default_config = config_creator::create_config_from_string(default_config_str.to_owned());
+    let default_config =
+        osm_parse_config_creator::create_config_from_string(default_config_str.to_owned());
     let config = arg_matches
         .value_of("config")
         .map_or(default_config, |input_file| {
-            config_creator::create_config_from_file(input_file.to_owned())
+            osm_parse_config_creator::create_config_from_file(input_file.to_owned())
         });
     let network_type = arg_matches.value_of("network").unwrap();
     let no_llc = arg_matches.is_present("nollc");
@@ -41,7 +42,7 @@ fn main() {
 
     //process
     let in_filename = arg_matches.value_of("input").unwrap();
-    let (nodes, ways) = read_osm::read_osm(&in_filename.to_owned(), &config);
+    let (nodes, ways) = osm_reader::read_osm(&in_filename.to_owned(), &config);
     let graph = osm_convert::convert(nodes, ways, &config);
 
     //output
@@ -65,7 +66,5 @@ fn main() {
     // - compute LLC
     // - compute contraction
     // - add code coverage
-    // - rename config to something like osm (road) parse config / osm convert config
     // - fill README.MD
-    // - [output] add a header to the output
 }
