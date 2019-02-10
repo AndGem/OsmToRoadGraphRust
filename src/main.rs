@@ -9,6 +9,7 @@ use clap::App;
 mod config;
 mod config_creator;
 mod graph;
+mod graph_data;
 mod osm_convert;
 mod output;
 mod read_osm;

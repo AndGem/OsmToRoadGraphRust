@@ -1,3 +1,5 @@
+use graph_data::EdgeDataDescription;
+
 #[derive(Debug, Copy, Clone)]
 pub struct GraphNodeId(pub u32);
 
@@ -17,54 +19,13 @@ pub struct GraphEdge<T> {
     pub data: T,
 }
 
-pub trait GraphEdgeFormat {
+pub trait GraphEdgeDescription {
     fn description(&self) -> String;
 }
 
 pub struct Graph<NodeData, EdgeData> {
     pub nodes: Vec<GraphNode<NodeData>>,
     pub edges: Vec<GraphEdge<EdgeData>>,
-}
-
-pub trait NodeDataAccess {
-    fn description(&self) -> String;
-}
-
-pub trait EdgeDataAccess {
-    fn name(&self) -> String {
-        "".to_string()
-    }
-
-    fn description(&self) -> String;
-}
-
-pub struct NodeData {
-    pub lat: f64,
-    pub lon: f64,
-}
-
-impl NodeDataAccess for NodeData {
-    fn description(&self) -> String {
-        format!("{:.6} {:.6}", self.lat, self.lon)
-    }
-}
-
-pub struct EdgeData {
-    pub name: String,
-    pub street_type: String,
-    pub max_speed: u8,
-    pub bidirectional: bool,
-}
-
-impl EdgeDataAccess for EdgeData {
-    fn name(&self) -> String {
-        return self.name.to_owned();
-    }
-
-    fn description(&self) -> String {
-        let dir = if self.bidirectional { 1 } else { 0 };
-        format!("{} {} {}", self.street_type, self.max_speed, dir)
-    }
 }
 
 impl<T> GraphNode<T> {
@@ -77,7 +38,7 @@ impl<T> GraphNode<T> {
     }
 }
 
-impl<T: EdgeDataAccess> GraphEdgeFormat for GraphEdge<T> {
+impl<T: EdgeDataDescription> GraphEdgeDescription for GraphEdge<T> {
     fn description(&self) -> String {
         format!("{} {} {}", self.s.0, self.t.0, self.data.description())
     }

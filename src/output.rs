@@ -1,11 +1,13 @@
 use graph;
 
-use graph::{EdgeDataAccess, GraphEdgeFormat, NodeDataAccess};
+use graph::GraphEdgeDescription;
+use graph_data::{EdgeDataDescription, NodeDataDescription};
+
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-pub fn write<TN: NodeDataAccess, TE: EdgeDataAccess>(
+pub fn write<TN: NodeDataDescription, TE: EdgeDataDescription>(
     g: &graph::Graph<TN, TE>,
     filename: String,
 ) -> Result<(), io::Error> {
@@ -23,7 +25,7 @@ pub fn write<TN: NodeDataAccess, TE: EdgeDataAccess>(
     Ok(())
 }
 
-pub fn write_names<TN: NodeDataAccess, TE: EdgeDataAccess>(
+pub fn write_names<TN: NodeDataDescription, TE: EdgeDataDescription>(
     g: &graph::Graph<TN, TE>,
     filename: String,
 ) -> Result<(), io::Error> {
