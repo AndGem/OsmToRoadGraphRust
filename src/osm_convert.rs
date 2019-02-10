@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 use config;
-use graph::{EdgeData, Graph, NodeData};
+use graph::Graph;
+use graph_data::{EdgeData, NodeData};
 use osmpbfreader::{Node, NodeId, Way};
 use util;
 
