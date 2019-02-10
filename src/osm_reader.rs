@@ -1,15 +1,14 @@
-use osmpbfreader::{Node, NodeId, Way};
+use osmpbfreader::{Node, NodeId, OsmObj, OsmPbfReader, Way};
 use std::collections::HashMap;
 use std::time::Instant;
 
-use config;
-use osmpbfreader;
+use osm_parse_config::OSMParseConfig;
 use std;
 
 fn filter_nodes_and_ways(
     mut nodes: HashMap<NodeId, Node>,
     mut ways: Vec<Way>,
-    config: &config::Config,
+    osm_parse_config: &OSMParseConfig,
 ) -> (HashMap<NodeId, Node>, Vec<Way>) {
     let mut ways_filtered: Vec<Way> = Vec::new();
     let mut nodes_filtered: HashMap<NodeId, Node> = HashMap::new();
@@ -28,7 +27,7 @@ fn filter_nodes_and_ways(
         let allowed_highway = way
             .tags
             .get("highway")
-            .map(|x| config.is_allowed("pedestrian", x))
+            .map(|x| osm_parse_config.is_allowed("pedestrian", x))
             .unwrap_or(false);
 
         let way_ok = all_nodes_available && !is_area && allowed_highway;
@@ -68,7 +67,7 @@ fn filter_nodes_and_ways(
 }
 
 fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>, Vec<Way>) {
-    let mut pbf = osmpbfreader::OsmPbfReader::new(file_reference);
+    let mut pbf = OsmPbfReader::new(file_reference);
 
     let mut nodes = HashMap::new();
     let mut ways = Vec::new();
@@ -76,10 +75,10 @@ fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>,
     let now = Instant::now();
     for obj in pbf.par_iter().map(Result::unwrap) {
         match obj {
-            osmpbfreader::OsmObj::Node(node) => {
+            OsmObj::Node(node) => {
                 nodes.insert(node.id, node);
             }
-            osmpbfreader::OsmObj::Way(way) => {
+            OsmObj::Way(way) => {
                 ways.push(way);
             }
             _ => {}
@@ -96,7 +95,7 @@ fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>,
     (nodes, ways)
 }
 
-pub fn read_osm(filename: &String, config: &config::Config) -> (HashMap<NodeId, Node>, Vec<Way>) {
+pub fn read_osm(filename: &String, config: &OSMParseConfig) -> (HashMap<NodeId, Node>, Vec<Way>) {
     let file_reference = std::fs::File::open(&std::path::Path::new(filename)).unwrap();
     let (nodes, ways) = read_nodes_and_ways(file_reference);
     filter_nodes_and_ways(nodes, ways, config)

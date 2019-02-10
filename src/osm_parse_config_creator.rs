@@ -1,10 +1,10 @@
-use config;
+use osm_parse_config::OSMParseConfig;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
 use yaml_rust::yaml::{Yaml, YamlLoader};
 
-pub fn create_config_from_file(filename: String) -> config::Config {
+pub fn create_config_from_file(filename: String) -> OSMParseConfig {
     let mut file = File::open(filename).unwrap();
     let mut file_content = String::new();
     file.read_to_string(&mut file_content).unwrap();
@@ -12,7 +12,7 @@ pub fn create_config_from_file(filename: String) -> config::Config {
     create_config_from_string(file_content)
 }
 
-pub fn create_config_from_string(config: String) -> config::Config {
+pub fn create_config_from_string(config: String) -> OSMParseConfig {
     let docs = YamlLoader::load_from_str(&config).unwrap();
     let doc = &docs[0];
 
@@ -20,7 +20,7 @@ pub fn create_config_from_string(config: String) -> config::Config {
     let max_speed_map = parse_max_speeds(doc);
     let default_walking_speed = parse_default_walking_speed(doc);
 
-    config::Config::new(allowed_highways, max_speed_map, default_walking_speed)
+    OSMParseConfig::new(allowed_highways, max_speed_map, default_walking_speed)
 }
 
 //TODO: add new type that reflects network type (i.e., not HashMap<String, ...> but HashMap<NETWORK_TYPE, ...>)

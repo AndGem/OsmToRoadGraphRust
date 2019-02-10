@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use config;
 use graph::Graph;
 use graph_data::{EdgeData, NodeData};
+use osm_parse_config;
 use osmpbfreader::{Node, NodeId, Way};
 use util;
 
 pub fn convert(
     nodes: HashMap<NodeId, Node>,
     ways: Vec<Way>,
-    config: &config::Config,
+    osm_parse_config: &osm_parse_config::OSMParseConfig,
 ) -> Graph<NodeData, EdgeData> {
     let now = Instant::now();
 
@@ -36,7 +36,7 @@ pub fn convert(
     for way in ways {
         let name = way.tags.get("name").unwrap_or(&empty_name).to_string();
         let street_type = way.tags.get("highway").unwrap().to_string();
-        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, &config);
+        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, &osm_parse_config);
         let bidirectional = way.tags.get("oneway").map(|x| x != "yes").unwrap_or(true);
 
         let data = EdgeData {
@@ -63,9 +63,13 @@ pub fn convert(
     g
 }
 
-fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Config) -> u8 {
+fn parse_speed(
+    speed: Option<&String>,
+    street_type: &String,
+    osm_parse_config: &osm_parse_config::OSMParseConfig,
+) -> u8 {
     if speed.is_none() {
-        return config.default_speed(street_type);
+        return osm_parse_config.default_speed(street_type);
     }
 
     let speed_info = speed.unwrap();
@@ -76,9 +80,9 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
     }
 
     if speed_info.contains("walk") {
-        return config.default_walking_speed();
+        return osm_parse_config.default_walking_speed();
     } else if speed_info.contains("none") {
-        return config.default_speed(street_type);
+        return osm_parse_config.default_speed(street_type);
     } else if speed_info.contains("mph") || speed_info.contains("mp/h") {
         let fac = 1.609344;
         let digits = util::keep_characters(speed_info, "0123456789");
@@ -96,7 +100,7 @@ fn parse_speed(speed: Option<&String>, street_type: &String, config: &config::Co
             "error while parsing max speed! Did not recognize: {}! Fallback used!",
             speed_info
         );
-        return config.default_speed(street_type);
+        return osm_parse_config.default_speed(street_type);
     }
 }
 
@@ -202,7 +206,7 @@ fn should_return_default_speed_if_garbage() {
 }
 
 #[cfg(test)]
-fn create_config() -> (config::Config, String, u8, u8) {
+fn create_config() -> (osm_parse_config::OSMParseConfig, String, u8, u8) {
     let highway: String = "barfoo".to_string();
     let highway_speed: u8 = 23;
     //
@@ -214,7 +218,8 @@ fn create_config() -> (config::Config, String, u8, u8) {
     let mut allowed_highways = HashSet::new();
     allowed_highways.insert(highway.to_owned());
 
-    let config = config::Config::new(HashMap::new(), max_speed, default_walking_speed);
+    let config =
+        osm_parse_config::OSMParseConfig::new(HashMap::new(), max_speed, default_walking_speed);
 
     return (config, highway, highway_speed, default_walking_speed);
 }
