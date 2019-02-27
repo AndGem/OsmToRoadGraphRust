@@ -1,14 +1,14 @@
 use std::collections::{HashMap, HashSet};
 
 pub struct OSMParseConfig {
-    allowed_highways: HashMap<String, HashSet<String>>,
+    allowed_highways: HashMap<::NetworkType, HashSet<String>>,
     max_speed: HashMap<String, u8>,
     default_walking_speed: u8,
 }
 
 impl OSMParseConfig {
     pub fn new(
-        allowed_highways: HashMap<String, HashSet<String>>,
+        allowed_highways: HashMap<::NetworkType, HashSet<String>>,
         max_speed: HashMap<String, u8>,
         default_walking_speed: u8,
     ) -> OSMParseConfig {
@@ -19,7 +19,7 @@ impl OSMParseConfig {
         }
     }
 
-    pub fn is_allowed(&self, key: &str, value: &str) -> bool {
+    pub fn is_allowed(&self, key: &::NetworkType, value: &str) -> bool {
         return self
             .allowed_highways
             .get(key)
