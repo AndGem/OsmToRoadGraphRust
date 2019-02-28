@@ -87,7 +87,6 @@ fn main() {
     // - compute contraction
     // - add code coverage
     // - fill README.MD
-    // - add to travis a test case to convert an OSM file
 }
 
 fn create_out_filename(in_filename: &str, network_type: &NetworkType) -> String {
