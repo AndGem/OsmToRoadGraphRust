@@ -1,4 +1,4 @@
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Debug)]
 pub enum NetworkType {
     Pedestrian,
     Car,
@@ -11,13 +11,5 @@ pub fn get_network_type(network_type: &str) -> NetworkType {
         "car" | "c" => NetworkType::Car,
         "bicycle" | "b" => NetworkType::Bicycle,
         _ => panic!("did not recognize type: {}", network_type),
-    }
-}
-
-pub fn short_network_type(t: &NetworkType) -> &str {
-    match t {
-        Pedestrian => "p",
-        Car => "c",
-        Bicycle => "b",
     }
 }
