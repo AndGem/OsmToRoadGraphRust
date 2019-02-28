@@ -5,8 +5,7 @@ extern crate osmpbfreader;
 extern crate lazy_static;
 extern crate yaml_rust;
 use clap::App;
-use network_type::{get_network_type, short_network_type, NetworkType};
-use std::fmt;
+use network_type::{get_network_type, NetworkType};
 
 mod graph;
 mod graph_data;
@@ -29,13 +28,15 @@ lazy_static! {
         let yaml = load_yaml!("cli.yaml");
         let arg_matches = App::from_yaml(yaml).get_matches();
 
-        get_network_type(arg_matches.value_of("network").unwrap())
+        let network_type = get_network_type(arg_matches.value_of("network").unwrap());
+        println!("converting OSM to network_type: {:?}", network_type);
+        network_type
     };
     static ref NO_LLC: bool = {
         let yaml = load_yaml!("cli.yaml");
         let arg_matches = App::from_yaml(yaml).get_matches();
 
-        arg_matches.is_present("nollc")
+        arg_matches.is_present("nolcc")
     };
     static ref CONTRACT: bool = {
         let yaml = load_yaml!("cli.yaml");
@@ -64,16 +65,9 @@ fn main() {
     let graph = osm_convert::convert(nodes, ways, &config);
 
     //output
-    let out_filename = format!(
-        "{}.py{}gr",
-        in_filename,
-        short_network_type(&(::NETWORK_TYPE))
-    );
-    let out_filename_names = format!(
-        "{}.py{}gr_names",
-        in_filename,
-        short_network_type(&(::NETWORK_TYPE))
-    );
+    let out_filename = create_out_filename(in_filename, &(NETWORK_TYPE));
+    let out_filename_names = format!("{}_names", out_filename);
+
     println!("writing graph to {}", out_filename);
     let output_result = output::write(&graph, out_filename);
     match output_result {
@@ -89,9 +83,19 @@ fn main() {
     };
 
     //TODO:
-    // - compute LLC
+    // - compute LCC
     // - compute contraction
     // - add code coverage
     // - fill README.MD
     // - add to travis a test case to convert an OSM file
+}
+
+fn create_out_filename(in_filename: &str, network_type: &NetworkType) -> String {
+    let identifier = match network_type {
+        NetworkType::Pedestrian => "p",
+        NetworkType::Car => "c",
+        NetworkType::Bicycle => "b",
+    };
+
+    format!("{}.py{}gr", in_filename, identifier)
 }

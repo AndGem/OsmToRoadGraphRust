@@ -17,10 +17,10 @@ args:
       default_value: p
       possible_values: [p, b, c]
       takes_value: true
-  - nollc:
+  - nolcc:
       help: do not compute only largest connected component
       short: l
-      long: nollc
+      long: nolcc
   - contract:
       help: compute also graph with contracted deg 2 nodes
       short: c
