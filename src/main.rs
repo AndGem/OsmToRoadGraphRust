@@ -5,9 +5,12 @@ extern crate osmpbfreader;
 extern crate lazy_static;
 extern crate yaml_rust;
 use clap::App;
+use network_type::{get_network_type, short_network_type, NetworkType};
+use std::fmt;
 
 mod graph;
 mod graph_data;
+mod network_type;
 mod osm_convert;
 mod osm_parse_config;
 mod osm_parse_config_creator;
@@ -15,12 +18,30 @@ mod osm_reader;
 mod output;
 mod util;
 
-//TODO: use this block to initialize a configuration object
 lazy_static! {
     static ref VERBOSE: bool = {
         let yaml = load_yaml!("cli.yaml");
         let arg_matches = App::from_yaml(yaml).get_matches();
+
         arg_matches.is_present("verbose")
+    };
+    static ref NETWORK_TYPE: NetworkType = {
+        let yaml = load_yaml!("cli.yaml");
+        let arg_matches = App::from_yaml(yaml).get_matches();
+
+        get_network_type(arg_matches.value_of("network").unwrap())
+    };
+    static ref NO_LLC: bool = {
+        let yaml = load_yaml!("cli.yaml");
+        let arg_matches = App::from_yaml(yaml).get_matches();
+
+        arg_matches.is_present("nollc")
+    };
+    static ref CONTRACT: bool = {
+        let yaml = load_yaml!("cli.yaml");
+        let arg_matches = App::from_yaml(yaml).get_matches();
+
+        arg_matches.is_present("contract")
     };
 }
 
@@ -36,9 +57,6 @@ fn main() {
         .map_or(default_config, |input_file| {
             osm_parse_config_creator::create_config_from_file(input_file.to_owned())
         });
-    let network_type = arg_matches.value_of("network").unwrap();
-    let no_llc = arg_matches.is_present("nollc");
-    let contract = arg_matches.is_present("contract");
 
     //process
     let in_filename = arg_matches.value_of("input").unwrap();
@@ -46,8 +64,16 @@ fn main() {
     let graph = osm_convert::convert(nodes, ways, &config);
 
     //output
-    let out_filename = format!("{}.py{}gr", in_filename, network_type);
-    let out_filename_names = format!("{}.py{}gr_names", in_filename, network_type);
+    let out_filename = format!(
+        "{}.py{}gr",
+        in_filename,
+        short_network_type(&(::NETWORK_TYPE))
+    );
+    let out_filename_names = format!(
+        "{}.py{}gr_names",
+        in_filename,
+        short_network_type(&(::NETWORK_TYPE))
+    );
     println!("writing graph to {}", out_filename);
     let output_result = output::write(&graph, out_filename);
     match output_result {
@@ -67,4 +93,5 @@ fn main() {
     // - compute contraction
     // - add code coverage
     // - fill README.MD
+    // - add to travis a test case to convert an OSM file
 }

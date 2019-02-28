@@ -1,4 +1,6 @@
+use network_type::get_network_type;
 use osm_parse_config::OSMParseConfig;
+
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
@@ -23,9 +25,8 @@ pub fn create_config_from_string(config: String) -> OSMParseConfig {
     OSMParseConfig::new(allowed_highways, max_speed_map, default_walking_speed)
 }
 
-//TODO: add new type that reflects network type (i.e., not HashMap<String, ...> but HashMap<NETWORK_TYPE, ...>)
-fn parse_allowed_highways(doc: &Yaml) -> HashMap<String, HashSet<String>> {
-    let mut allowed_highways: HashMap<String, HashSet<String>> = HashMap::new();
+fn parse_allowed_highways(doc: &Yaml) -> HashMap<::NetworkType, HashSet<String>> {
+    let mut allowed_highways: HashMap<::NetworkType, HashSet<String>> = HashMap::new();
 
     let allowed_highways_file = doc["allowed_highways"].as_vec().unwrap();
     for entry in allowed_highways_file {
@@ -37,7 +38,8 @@ fn parse_allowed_highways(doc: &Yaml) -> HashMap<String, HashSet<String>> {
                 .map(|x| x.to_string())
                 .collect::<HashSet<String>>();
 
-            allowed_highways.insert(key.as_str().unwrap().to_string(), types);
+            let network_type = get_network_type(key.as_str().unwrap());
+            allowed_highways.insert(network_type, types);
         }
     }
 

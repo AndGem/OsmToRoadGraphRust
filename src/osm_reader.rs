@@ -27,7 +27,7 @@ fn filter_nodes_and_ways(
         let allowed_highway = way
             .tags
             .get("highway")
-            .map(|x| osm_parse_config.is_allowed("pedestrian", x))
+            .map(|x| osm_parse_config.is_allowed(&(::NETWORK_TYPE), x))
             .unwrap_or(false);
 
         let way_ok = all_nodes_available && !is_area && allowed_highway;
