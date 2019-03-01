@@ -8,5 +8,4 @@ matrix:
   fast_finish: true
 cache: cargo
 script:
-  - cargo build --verbose
-  - cargo test --verbose
+  - ./pr_checker.sh
