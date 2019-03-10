@@ -1,4 +1,5 @@
 use graph_data::EdgeDataDescription;
+use std::ops::Range;
 
 #[derive(Debug, Copy, Clone)]
 pub struct GraphNodeId(pub u32);
@@ -84,5 +85,36 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
                 .unwrap()
                 .add_edge(edge_index);
         }
+    }
+
+    pub fn node_indices(&self) -> Range<GraphNodeId> {
+        if self.nodes.is_empty() {
+            return Range {
+                start: GraphNodeId(0),
+                end: GraphNodeId(0),
+            }; //empty range
+        }
+
+        let last_node = GraphNodeId((self.nodes.len() as u32) + 1);
+        Range {
+            start: GraphNodeId(0),
+            end: last_node,
+        }
+    }
+
+    pub fn edge_count(&self) -> u32 {
+        self.edges.len() as u32
+    }
+
+    pub fn node_count(&self) -> u32 {
+        self.nodes.len() as u32
+    }
+
+    pub fn out_edges(&self, index: u32) -> &Vec<GraphEdgeId> {
+        self.nodes[index as usize].get_edges()
+    }
+
+    pub fn get_edge(&self, id: &GraphEdgeId) -> &GraphEdge<EdgeData> {
+        &self.edges[id.0 as usize]
     }
 }

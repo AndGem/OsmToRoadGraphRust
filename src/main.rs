@@ -5,10 +5,12 @@ extern crate osmpbfreader;
 extern crate lazy_static;
 extern crate yaml_rust;
 use clap::App;
+use lcc::compute_lcc;
 use network_type::{get_network_type, NetworkType};
 
 mod graph;
 mod graph_data;
+mod lcc;
 mod network_type;
 mod osm_convert;
 mod osm_parse_config;
@@ -63,6 +65,7 @@ fn main() {
     let in_filename = arg_matches.value_of("input").unwrap();
     let (nodes, ways) = osm_reader::read_osm(&in_filename.to_owned(), &config);
     let graph = osm_convert::convert(nodes, ways, &config);
+    compute_lcc(&graph);
 
     //output
     let out_filename = create_out_filename(in_filename, &(NETWORK_TYPE));
