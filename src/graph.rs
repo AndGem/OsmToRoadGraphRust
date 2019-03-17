@@ -1,10 +1,9 @@
 use graph_data::EdgeDataDescription;
-use std::ops::Range;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct GraphNodeId(pub u32);
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct GraphEdgeId(pub u32);
 
 pub struct GraphNode<T> {
@@ -87,19 +86,14 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
         }
     }
 
-    pub fn node_indices(&self) -> Range<GraphNodeId> {
+    pub fn node_indices(&self) -> Vec<GraphNodeId> {
         if self.nodes.is_empty() {
-            return Range {
-                start: GraphNodeId(0),
-                end: GraphNodeId(0),
-            }; //empty range
+            return Vec::new();
         }
 
-        let last_node = GraphNodeId((self.nodes.len() as u32) + 1);
-        Range {
-            start: GraphNodeId(0),
-            end: last_node,
-        }
+        let last_node_id = self.nodes.len() as u32;
+        let result = (0..last_node_id).map(|x| GraphNodeId(x)).collect();
+        result
     }
 
     pub fn edge_count(&self) -> u32 {
@@ -110,11 +104,18 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
         self.nodes.len() as u32
     }
 
-    pub fn out_edges(&self, index: u32) -> &Vec<GraphEdgeId> {
-        self.nodes[index as usize].get_edges()
+    pub fn out_edges(&self, index: &GraphNodeId) -> &Vec<GraphEdgeId> {
+        self.nodes[index.0 as usize].get_edges()
     }
 
     pub fn get_edge(&self, id: &GraphEdgeId) -> &GraphEdge<EdgeData> {
         &self.edges[id.0 as usize]
     }
 }
+
+/* 
+TODO:
+ - return value to add_edge
+ - add_edge -> add_unidirectional_edge, add_bidirectional_edge
+
+*/

@@ -4,6 +4,9 @@ extern crate osmpbfreader;
 #[macro_use]
 extern crate lazy_static;
 extern crate yaml_rust;
+#[macro_use]
+extern crate galvanic_assert;
+
 use clap::App;
 use lcc::compute_lcc;
 use network_type::{get_network_type, NetworkType};
