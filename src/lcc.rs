@@ -1,16 +1,17 @@
-use graph::{Graph, GraphEdge, GraphEdgeId, GraphNode, GraphNodeId};
+use graph::{Graph, GraphEdgeId, GraphNodeId};
 use graph_data::{EdgeData, NodeData};
 
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
 
-pub fn compute_lcc(graph: &Graph<NodeData, EdgeData>) {}
+pub fn compute_lcc(graph: &Graph<NodeData, EdgeData>) {
+    let _x = kosaraju(graph);
+}
 
 fn kosaraju(graph: &Graph<NodeData, EdgeData>) {
     //TODO: remove implicit assumption that node indices are integers from 0 to n - 1
-    //TODO: remove all leakage that indices are u32
 
-    let (result, in_edges) = kosaraju_step1_2(graph);
+    let (_result, _in_edges) = kosaraju_step1_2(graph);
 
     // 3. For each element u of L in order, do Assign(u,u) where Assign(u,root) is the recursive subroutine:
 
@@ -38,7 +39,7 @@ fn kosaraju_step1_2<S, T>(
 ) {
     // 1. For each vertex u of the graph, mark u as unvisited. Let list L be empty.
     // 2. For each vertex u of the graph do Visit(u), where Visit(u) is the recursive subroutine:
-    let mut L: VecDeque<GraphNodeId> = VecDeque::new();
+    let mut ordering: VecDeque<GraphNodeId> = VecDeque::new();
     let mut in_edges: HashMap<GraphNodeId, Vec<GraphEdgeId>> = HashMap::new();
     let nodes = graph.node_indices();
     let mut visited = HashSet::new();
@@ -74,31 +75,28 @@ fn kosaraju_step1_2<S, T>(
                 }
             }
             println!();
-            L.push_back(node_id);
+            ordering.push_back(node_id);
         }
     }
 
-    (L, in_edges)
+    (ordering, in_edges)
 }
-
-//todo test kosaraju_step12
 
 // TESTS
 #[cfg(test)]
 use galvanic_assert::matchers::collection::*;
-
-struct Nothing;
+use graph::NothingData;
 
 #[test]
 fn graph_with_two_nodes_should_return_both() {
-    let mut g: Graph<Nothing, Nothing> = Graph {
+    let mut g: Graph = Graph {
         nodes: Vec::new(),
         edges: Vec::new(),
     };
 
-    let s = g.add_node(Nothing);
-    let t = g.add_node(Nothing);
-    g.add_edge(&s, &t, Nothing, true);
+    let s = g.add_node(NothingData {});
+    let t = g.add_node(NothingData {});
+    g.add_bidirectional_edge(&s, &t, NothingData {});
 
     let (result, in_edges) = kosaraju_step1_2(&g);
     assert_that!(
@@ -109,7 +107,7 @@ fn graph_with_two_nodes_should_return_both() {
 
 #[test]
 fn graph_with_four_nodes_and_cycle() {
-    let mut g: Graph<Nothing, Nothing> = Graph {
+    let mut g: Graph = Graph {
         nodes: Vec::new(),
         edges: Vec::new(),
     };
@@ -123,14 +121,14 @@ fn graph_with_four_nodes_and_cycle() {
     //  +---------+3|
     //            +-+
 
-    let v0 = g.add_node(Nothing);
-    let v1 = g.add_node(Nothing);
-    let v2 = g.add_node(Nothing);
-    let v3 = g.add_node(Nothing);
-    g.add_edge(&v0, &v1, Nothing, false);
-    g.add_edge(&v1, &v2, Nothing, false);
-    g.add_edge(&v1, &v3, Nothing, false);
-    g.add_edge(&v3, &v0, Nothing, false);
+    let v0 = g.add_node(NothingData {});
+    let v1 = g.add_node(NothingData {});
+    let v2 = g.add_node(NothingData {});
+    let v3 = g.add_node(NothingData {});
+    let e0 = g.add_unidirectional_edge(&v0, &v1, NothingData {});
+    let e1 = g.add_unidirectional_edge(&v1, &v2, NothingData {});
+    let e2 = g.add_unidirectional_edge(&v1, &v3, NothingData {});
+    let e3 = g.add_unidirectional_edge(&v3, &v0, NothingData {});
 
     let (result, in_edges) = kosaraju_step1_2(&g);
     assert_that!(
@@ -143,27 +141,15 @@ fn graph_with_four_nodes_and_cycle() {
         ])
     );
 
-    assert_that!(
-        in_edges.get(&v0).unwrap(),
-        contains_in_order(vec![GraphEdgeId(3)])
-    );
-    assert_that!(
-        in_edges.get(&v1).unwrap(),
-        contains_in_order(vec![GraphEdgeId(0)])
-    );
-    assert_that!(
-        in_edges.get(&v2).unwrap(),
-        contains_in_order(vec![GraphEdgeId(1)])
-    );
-    assert_that!(
-        in_edges.get(&v3).unwrap(),
-        contains_in_order(vec![GraphEdgeId(2)])
-    );
+    assert_that!(in_edges.get(&v0).unwrap(), contains_in_order(vec![e3]));
+    assert_that!(in_edges.get(&v1).unwrap(), contains_in_order(vec![e0]));
+    assert_that!(in_edges.get(&v2).unwrap(), contains_in_order(vec![e1]));
+    assert_that!(in_edges.get(&v3).unwrap(), contains_in_order(vec![e2]));
 }
 
 #[test]
 fn graph_with_disconnected_component() {
-    let mut g: Graph<Nothing, Nothing> = Graph {
+    let mut g: Graph = Graph {
         nodes: Vec::new(),
         edges: Vec::new(),
     };
@@ -177,14 +163,14 @@ fn graph_with_disconnected_component() {
     //            +4|  +1|
     //            +-+  +-+
 
-    let v0 = g.add_node(Nothing);
-    let v1 = g.add_node(Nothing);
-    let v2 = g.add_node(Nothing);
-    let v3 = g.add_node(Nothing);
-    let v4 = g.add_node(Nothing);
-    g.add_edge(&v0, &v2, Nothing, false);
-    g.add_edge(&v2, &v3, Nothing, false);
-    g.add_edge(&v2, &v4, Nothing, false);
+    let v0 = g.add_node(NothingData {});
+    let v1 = g.add_node(NothingData {});
+    let v2 = g.add_node(NothingData {});
+    let v3 = g.add_node(NothingData {});
+    let v4 = g.add_node(NothingData {});
+    let e0 = g.add_unidirectional_edge(&v0, &v2, NothingData {});
+    let e1 = g.add_unidirectional_edge(&v2, &v3, NothingData {});
+    let e2 = g.add_unidirectional_edge(&v2, &v4, NothingData {});
 
     let (result, in_edges) = kosaraju_step1_2(&g);
     assert_that!(
@@ -200,23 +186,14 @@ fn graph_with_disconnected_component() {
     assert!(in_edges.get(&v0).is_none());
     assert!(in_edges.get(&v1).is_none());
 
-    assert_that!(
-        in_edges.get(&v2).unwrap(),
-        contains_in_order(vec![GraphEdgeId(0)])
-    );
-    assert_that!(
-        in_edges.get(&v3).unwrap(),
-        contains_in_order(vec![GraphEdgeId(1)])
-    );
-    assert_that!(
-        in_edges.get(&v4).unwrap(),
-        contains_in_order(vec![GraphEdgeId(2)])
-    );
+    assert_that!(in_edges.get(&v2).unwrap(), contains_in_order(vec![e0]));
+    assert_that!(in_edges.get(&v3).unwrap(), contains_in_order(vec![e1]));
+    assert_that!(in_edges.get(&v4).unwrap(), contains_in_order(vec![e2]));
 }
 
 #[test]
 fn empty_graph_returns_empty_response() {
-    let g: Graph<Nothing, Nothing> = Graph {
+    let g: Graph = Graph {
         nodes: Vec::new(),
         edges: Vec::new(),
     };
