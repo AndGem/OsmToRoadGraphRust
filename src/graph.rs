@@ -135,6 +135,6 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
     }
 }
 
-/* 
+/*
  - TODO: remove all leakage that indices are u32
 */

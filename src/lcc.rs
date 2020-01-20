@@ -3,15 +3,16 @@ use graph_data::{EdgeData, NodeData};
 
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
+use std::time::Instant;
 
 pub fn compute_lcc(graph: &Graph<NodeData, EdgeData>) {
+    let now = Instant::now();
     let _x = kosaraju(graph);
+    println!("did kosaraju lcc: {}s", now.elapsed().as_secs());
 }
 
 fn kosaraju(graph: &Graph<NodeData, EdgeData>) {
-    //TODO: remove implicit assumption that node indices are integers from 0 to n - 1
-
-    let (_result, _in_edges) = kosaraju_step1_2(graph);
+    let (_ordering, _in_edges) = kosaraju_step1_2(graph);
 
     // 3. For each element u of L in order, do Assign(u,u) where Assign(u,root) is the recursive subroutine:
 
@@ -74,7 +75,6 @@ fn kosaraju_step1_2<S, T>(
                     }
                 }
             }
-            println!();
             ordering.push_back(node_id);
         }
     }
