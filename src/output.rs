@@ -21,17 +21,17 @@ pub fn write<TN: NodeDataDescription, TE: EdgeDataDescription>(
 ) -> Result<(), io::Error> {
     let mut f = File::create(filename)?;
 
-    f.write(HEADER.as_bytes())?;
-    f.write(b"\n")?;
+    f.write_all(HEADER.as_bytes())?;
+    f.write_all(b"\n")?;
 
     for node in &g.nodes {
-        f.write(node.data.description().as_bytes())?;
-        f.write(b"\n")?;
+        f.write_all(node.data.description().as_bytes())?;
+        f.write_all(b"\n")?;
     }
 
     for edge in &g.edges {
-        f.write(edge.description().as_bytes())?;
-        f.write(b"\n")?;
+        f.write_all(edge.description().as_bytes())?;
+        f.write_all(b"\n")?;
     }
 
     Ok(())
@@ -44,8 +44,8 @@ pub fn write_names<TN: NodeDataDescription, TE: EdgeDataDescription>(
     let mut f = File::create(filename)?;
 
     for edge in &g.edges {
-        f.write(edge.data.name().as_bytes())?;
-        f.write(b"\n")?;
+        f.write_all(edge.data.name().as_bytes())?;
+        f.write_all(b"\n")?;
     }
 
     Ok(())

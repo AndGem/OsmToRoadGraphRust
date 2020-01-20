@@ -38,7 +38,6 @@ fn filter_nodes_and_ways(
                 .filter_map(|x| nodes.remove(x))
                 .for_each(|n| {
                     nodes_filtered.insert(n.id, n);
-                    ()
                 });
 
             ways_filtered.push(way);
@@ -63,7 +62,7 @@ fn filter_nodes_and_ways(
     );
     println!();
 
-    return (nodes_filtered, ways_filtered);
+    (nodes_filtered, ways_filtered)
 }
 
 fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>, Vec<Way>) {

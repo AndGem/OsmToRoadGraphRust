@@ -30,7 +30,7 @@ impl NodeDataDescription for NodeData {
 
 impl EdgeDataDescription for EdgeData {
     fn name(&self) -> String {
-        return self.name.to_owned();
+        self.name.to_owned()
     }
 
     fn description(&self) -> String {

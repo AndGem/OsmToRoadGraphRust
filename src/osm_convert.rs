@@ -40,16 +40,16 @@ pub fn convert(
         let bidirectional = way.tags.get("oneway").map(|x| x != "yes").unwrap_or(true);
 
         let data = EdgeData {
-            name: name,
-            street_type: street_type,
-            max_speed: max_speed,
-            bidirectional: bidirectional,
+            name,
+            street_type,
+            max_speed,
+            bidirectional,
         };
 
         let s = node_map.get(way.nodes.first().unwrap()).unwrap();
         let t = node_map.get(way.nodes.last().unwrap()).unwrap();
 
-        g.add_edge(s, t, data, bidirectional);
+        g.add_edge(*s, *t, data, bidirectional);
     }
 
     println!(
@@ -80,27 +80,27 @@ fn parse_speed(
     }
 
     if speed_info.contains("walk") {
-        return osm_parse_config.default_walking_speed();
+        osm_parse_config.default_walking_speed()
     } else if speed_info.contains("none") {
-        return osm_parse_config.default_speed(street_type);
+        osm_parse_config.default_speed(street_type)
     } else if speed_info.contains("mph") || speed_info.contains("mp/h") {
-        let fac = 1.609344;
+        let fac = 1.609_344;
         let digits = util::keep_characters(speed_info, "0123456789");
         let value = digits.parse::<f64>().unwrap() * fac;
-        return value as u8;
+        value as u8
     } else if speed_info.contains("kph")
         || speed_info.contains("kmh")
         || speed_info.contains("km/h")
     {
         let digits = util::keep_characters(speed_info, "0123456789");
-        let value = digits.parse::<u8>().unwrap();
-        return value;
+
+        digits.parse::<u8>().unwrap()
     } else {
         println!(
             "error while parsing max speed! Did not recognize: {}! Fallback used!",
             speed_info
         );
-        return osm_parse_config.default_speed(street_type);
+        osm_parse_config.default_speed(street_type)
     }
 }
 
