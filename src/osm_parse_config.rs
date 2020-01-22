@@ -30,7 +30,7 @@ impl OSMParseConfig {
         self.default_walking_speed
     }
 
-    pub fn default_speed(&self, street_type: &String) -> u8 {
+    pub fn default_speed(&self, street_type: &str) -> u8 {
         match self.max_speed.get(street_type) {
             Some(result) => *result,
             None => {

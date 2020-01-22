@@ -1,4 +1,4 @@
-pub fn keep_characters(original: &String, to_keep: &str) -> String {
+pub fn keep_characters(original: &str, to_keep: &str) -> String {
     original.chars().filter(|&c| to_keep.contains(c)).collect()
 }
 

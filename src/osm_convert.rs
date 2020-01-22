@@ -65,7 +65,7 @@ pub fn convert(
 
 fn parse_speed(
     speed: Option<&String>,
-    street_type: &String,
+    street_type: &str,
     osm_parse_config: &osm_parse_config::OSMParseConfig,
 ) -> u8 {
     if speed.is_none() {

@@ -18,9 +18,10 @@ fn filter_nodes_and_ways(
     let now = Instant::now();
     while !ways.is_empty() {
         let way = ways.pop().unwrap();
-        let all_nodes_available = way.nodes.iter().fold(true, |acc, x| {
-            acc && (nodes.contains_key(x) || nodes_filtered.contains_key(x))
-        });
+        let all_nodes_available = way
+            .nodes
+            .iter()
+            .all(|x| (nodes.contains_key(x) || nodes_filtered.contains_key(x)));
 
         let is_area = way.tags.get("area").map(|x| x == "yes").unwrap_or(false);
 
@@ -94,7 +95,7 @@ fn read_nodes_and_ways(file_reference: std::fs::File) -> (HashMap<NodeId, Node>,
     (nodes, ways)
 }
 
-pub fn read_osm(filename: &String, config: &OSMParseConfig) -> (HashMap<NodeId, Node>, Vec<Way>) {
+pub fn read_osm(filename: &str, config: &OSMParseConfig) -> (HashMap<NodeId, Node>, Vec<Way>) {
     let file_reference = std::fs::File::open(&std::path::Path::new(filename)).unwrap();
     let (nodes, ways) = read_nodes_and_ways(file_reference);
     filter_nodes_and_ways(nodes, ways, config)
