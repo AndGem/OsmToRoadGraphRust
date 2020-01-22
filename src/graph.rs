@@ -58,8 +58,8 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
 
     pub fn add_edge(
         &mut self,
-        s: &GraphNodeId,
-        t: &GraphNodeId,
+        s: GraphNodeId,
+        t: GraphNodeId,
         edge_data: EdgeData,
         bidirectional: bool,
     ) {
@@ -67,8 +67,8 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
 
         let new_edge = GraphEdge {
             id: edge_index,
-            s: *s,
-            t: *t,
+            s,
+            t,
             data: edge_data,
         };
         self.edges.push(new_edge);

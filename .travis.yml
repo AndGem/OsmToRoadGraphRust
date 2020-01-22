@@ -2,10 +2,19 @@ language: rust
 rust:
   - stable
   - nightly
-matrix:
+  before_script:
+    - rustup component add clippy
+  matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
 cache: cargo
 script:
+  - cargo clippy
+  # if you want the build job to fail when encountering warnings, use
+  - cargo clippy -- -D warnings
+  # in order to also check tests and non-default crate features, use
+  - cargo clippy --all-targets --all-features -- -D warnings
+  - cargo test
+  # etc.
   - ./pr_checker.sh
