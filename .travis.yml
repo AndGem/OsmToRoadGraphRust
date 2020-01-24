@@ -10,9 +10,8 @@ rust:
   fast_finish: true
 cache: cargo
 script:
-  # check clippy
+  # check clippy & run tests
   - cargo clippy -- -D warnings
-  # test
   - cargo test
   # check if conversion is successful
   - cargo build --release
