@@ -11,7 +11,7 @@ rust:
 cache: cargo
 script:
   # check clippy
-  - cargo clippy -- -D warnings
+  # - cargo clippy -- -D warnings
   # test
   # - cargo test
   # check if conversion is successful
