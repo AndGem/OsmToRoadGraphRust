@@ -13,8 +13,8 @@ script:
   # check clippy
   - cargo clippy -- -D warnings
   # test
-  - cargo test
+  # - cargo test
   # check if conversion is successful
-  - cargo build --release
-  - wget https://download.geofabrik.de/europe/germany/bremen-latest.osm.pbf
-  - target/release/osmtoroadgraph --verbose -n c bremen-latest.osm.pbf
+  # - cargo build --release
+  # - wget https://download.geofabrik.de/europe/germany/bremen-latest.osm.pbf
+  # - target/release/osmtoroadgraph --verbose -n c bremen-latest.osm.pbf
