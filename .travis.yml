@@ -11,7 +11,7 @@ fast_finish: true
 cache: cargo
 script:
   # check clippy
-  - cargo clippy -- -D warnings
+  - cargo clippy
   # test
   - cargo test
   # check if conversion is successful
