@@ -2,19 +2,19 @@ language: rust
 rust:
   - stable
   - nightly
-  before_script:
-    - rustup component add clippy
-  matrix:
-  allow_failures:
-    - rust: nightly
-  fast_finish: true
+before_script:
+  - rustup component add clippy
+matrix:
+allow_failures:
+  - rust: nightly
+fast_finish: true
 cache: cargo
 script:
+  # check clippy
   - cargo clippy
-  # if you want the build job to fail when encountering warnings, use
-  - cargo clippy -- -D warnings
-  # in order to also check tests and non-default crate features, use
-  - cargo clippy --all-targets --all-features -- -D warnings
+  # test
   - cargo test
-  # etc.
-  - ./pr_checker.sh
+  # check if conversion is successful
+  - cargo build --release
+  - wget https://download.geofabrik.de/europe/germany/bremen-latest.osm.pbf
+  - target/release/osmtoroadgraph --verbose -n c bremen-latest.osm.pbf
