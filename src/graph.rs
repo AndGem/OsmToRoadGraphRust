@@ -64,7 +64,7 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
         t: &GraphNodeId,
         edge_data: EdgeData,
     ) -> GraphEdgeId {
-        self.add_edge(s, t, edge_data, false)
+        self.add_edge(*s, *t, edge_data, false)
     }
 
     pub fn add_bidirectional_edge(
@@ -73,13 +73,13 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
         t: &GraphNodeId,
         edge_data: EdgeData,
     ) -> GraphEdgeId {
-        self.add_edge(s, t, edge_data, true)
+        self.add_edge(*s, *t, edge_data, true)
     }
 
     fn add_edge(
         &mut self,
-        s: &GraphNodeId,
-        t: &GraphNodeId,
+        s: GraphNodeId,
+        t: GraphNodeId,
         edge_data: EdgeData,
         bidirectional: bool,
     ) -> GraphEdgeId {
@@ -87,8 +87,8 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
 
         let new_edge = GraphEdge {
             id: edge_index,
-            s: *s,
-            t: *t,
+            s,
+            t,
             data: edge_data,
         };
         self.edges.push(new_edge);
