@@ -4,6 +4,7 @@ extern crate osmpbfreader;
 #[macro_use]
 extern crate lazy_static;
 extern crate yaml_rust;
+extern crate smartstring;
 use clap::App;
 use network_type::{get_network_type, NetworkType};
 
