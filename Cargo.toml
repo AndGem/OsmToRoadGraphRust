@@ -7,7 +7,7 @@ osmpbfreader = "0.15.2"
 yaml-rust = "0.4.5"
 clap = {version = "~2.34", features = ["yaml"]}
 lazy_static = "1.4.0"
-smartstring = { version = "*", features = ["proptest", "serde"] }
+smartstring = { version = "0.2", features = ["proptest", "serde"] }
 
 [build-dependencies]
 protobuf-codegen-pure = "2"
