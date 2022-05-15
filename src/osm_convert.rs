@@ -51,7 +51,10 @@ pub fn convert(
         let s = node_map.get(way.nodes.first().unwrap()).unwrap();
         let t = node_map.get(way.nodes.last().unwrap()).unwrap();
 
-        g.add_edge(*s, *t, data, bidirectional);
+        match bidirectional {
+            true => g.add_bidirectional_edge(s, t, data),
+            false => g.add_unidirectional_edge(s, t, data),
+        };
     }
 
     println!(

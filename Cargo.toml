@@ -8,6 +8,7 @@ yaml-rust = "0.4.5"
 clap = {version = "~2.34", features = ["yaml"]}
 lazy_static = "1.4.0"
 smartstring = { version = "0.2", features = ["proptest", "serde"] }
+galvanic-assert = "0.8.7"
 
 [build-dependencies]
 protobuf-codegen-pure = "2"

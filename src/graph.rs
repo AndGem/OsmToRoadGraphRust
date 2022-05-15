@@ -1,12 +1,14 @@
 use graph_data::EdgeDataDescription;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct GraphNodeId(pub u32);
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct GraphEdgeId(pub u32);
 
-pub struct GraphNode<T> {
+pub struct NothingData;
+
+pub struct GraphNode<T = NothingData> {
     pub id: GraphNodeId,
     pub data: T,
     out_edges: Vec<GraphEdgeId>,
@@ -23,7 +25,7 @@ pub trait GraphEdgeDescription {
     fn description(&self) -> String;
 }
 
-pub struct Graph<NodeData, EdgeData> {
+pub struct Graph<NodeData = NothingData, EdgeData = NothingData> {
     pub nodes: Vec<GraphNode<NodeData>>,
     pub edges: Vec<GraphEdge<EdgeData>>,
 }
@@ -56,13 +58,31 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
         node_id
     }
 
-    pub fn add_edge(
+    pub fn add_unidirectional_edge(
+        &mut self,
+        s: &GraphNodeId,
+        t: &GraphNodeId,
+        edge_data: EdgeData,
+    ) -> GraphEdgeId {
+        self.add_edge(*s, *t, edge_data, false)
+    }
+
+    pub fn add_bidirectional_edge(
+        &mut self,
+        s: &GraphNodeId,
+        t: &GraphNodeId,
+        edge_data: EdgeData,
+    ) -> GraphEdgeId {
+        self.add_edge(*s, *t, edge_data, true)
+    }
+
+    fn add_edge(
         &mut self,
         s: GraphNodeId,
         t: GraphNodeId,
         edge_data: EdgeData,
         bidirectional: bool,
-    ) {
+    ) -> GraphEdgeId {
         let edge_index = GraphEdgeId(self.edges.len() as u32);
 
         let new_edge = GraphEdge {
@@ -84,5 +104,37 @@ impl<NodeData, EdgeData> Graph<NodeData, EdgeData> {
                 .unwrap()
                 .add_edge(edge_index);
         }
+
+        edge_index
+    }
+
+    pub fn node_indices(&self) -> Vec<GraphNodeId> {
+        if self.nodes.is_empty() {
+            return Vec::new();
+        }
+
+        let last_node_id = self.nodes.len() as u32;
+        let result = (0..last_node_id).map(|x| GraphNodeId(x)).collect();
+        result
+    }
+
+    pub fn edge_count(&self) -> u32 {
+        self.edges.len() as u32
+    }
+
+    pub fn node_count(&self) -> u32 {
+        self.nodes.len() as u32
+    }
+
+    pub fn out_edges(&self, index: &GraphNodeId) -> &Vec<GraphEdgeId> {
+        self.nodes[index.0 as usize].get_edges()
+    }
+
+    pub fn get_edge(&self, id: &GraphEdgeId) -> &GraphEdge<EdgeData> {
+        &self.edges[id.0 as usize]
     }
 }
+
+/*
+ - TODO: remove all leakage that indices are u32
+*/
