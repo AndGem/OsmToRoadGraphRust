@@ -34,12 +34,11 @@ pub fn convert(
     }
 
     let empty_name = String::from("");
-    let max_speed_str = String::from("maxspeed");
 
     for way in ways {
         let name = way.tags.get("name").unwrap_or(&empty_name).to_string();
         let street_type = way.tags.get("highway").unwrap().to_string();
-        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, &osm_parse_config);
+        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, osm_parse_config);
         let bidirectional = way.tags.get("oneway").map(|x| x != "yes").unwrap_or(true);
 
         let data = EdgeData {

@@ -62,7 +62,7 @@ fn main() {
 
     //process
     let in_filename = arg_matches.value_of("input").unwrap();
-    let (nodes, ways) = osm_reader::read_osm(&in_filename.to_owned(), &config);
+    let (nodes, ways) = osm_reader::read_osm(in_filename, &config);
     let graph = osm_convert::convert(nodes, ways, &config);
 
     //output
