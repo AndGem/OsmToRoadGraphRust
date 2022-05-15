@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
+use smartstring::alias::String;
+
 use graph::Graph;
 use graph_data::{EdgeData, NodeData};
 use osm_parse_config;
@@ -31,12 +33,12 @@ pub fn convert(
         node_map.insert(k, new_node_id);
     }
 
-    let empty_name = "".to_string();
+    let empty_name = String::from("");
 
     for way in ways {
         let name = way.tags.get("name").unwrap_or(&empty_name).to_string();
         let street_type = way.tags.get("highway").unwrap().to_string();
-        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, &osm_parse_config);
+        let max_speed = parse_speed(way.tags.get("maxspeed"), &street_type, osm_parse_config);
         let bidirectional = way.tags.get("oneway").map(|x| x != "yes").unwrap_or(true);
 
         let data = EdgeData {
@@ -127,7 +129,7 @@ fn should_return_default_speed_for_highway_when_speed_is_none() {
 fn should_return_default_default_walking_speed_when_speed_is_walk() {
     let (config, highway, _highway_speed, default_walking_speed) = create_config();
 
-    let speed_str = "walk".to_string();
+    let speed_str = String::from("walk");
     let speed = Some(&speed_str);
     let street_type: String = highway.to_owned();
 
@@ -140,7 +142,7 @@ fn should_return_default_default_walking_speed_when_speed_is_walk() {
 fn should_return_default_default_highway_speed_when_contains_none() {
     let (config, highway, highway_speed, _default_walking_speed) = create_config();
 
-    let speed_str = "none".to_string();
+    let speed_str = String::from("none");
     let speed = Some(&speed_str);
     let street_type: String = highway.to_owned();
 
@@ -153,7 +155,7 @@ fn should_return_default_default_highway_speed_when_contains_none() {
 fn should_return_mph_speed() {
     let (config, highway, _highway_speed, _default_walking_speed) = create_config();
 
-    let speed_str = "10 mph".to_string();
+    let speed_str = String::from("10 mph");
     let speed = Some(&speed_str);
     let street_type: String = highway.to_owned();
 
@@ -172,7 +174,7 @@ fn should_return_kmh_speed() {
     let kmhs = ["kmh", "km/h", "kph"];
     let speed_str = "123";
     for s in kmhs.iter() {
-        let speed_str = speed_str.to_string() + s;
+        let speed_str = String::from(speed_str) + String::from(s.to_owned());
         let speed = Some(&speed_str);
         let street_type: String = highway.to_owned();
 
@@ -186,7 +188,7 @@ fn should_return_kmh_speed() {
 fn should_return_speed() {
     let (config, highway, _highway_speed, _default_walking_speed) = create_config();
 
-    let speed_str = "22".to_string();
+    let speed_str = String::from("22");
     let speed = Some(&speed_str);
     let street_type: String = highway.to_owned();
 
@@ -199,7 +201,7 @@ fn should_return_speed() {
 fn should_return_default_speed_if_garbage() {
     let (config, highway, highway_speed, _default_walking_speed) = create_config();
 
-    let speed_str = "garbage".to_string();
+    let speed_str = String::from("garbage");
     let speed = Some(&speed_str);
     let street_type: String = highway.to_owned();
 
@@ -210,10 +212,10 @@ fn should_return_default_speed_if_garbage() {
 
 #[cfg(test)]
 fn create_config() -> (osm_parse_config::OSMParseConfig, String, u8, u8) {
-    let highway: String = "barfoo".to_string();
+    let highway = "barfoo".to_owned();
     let highway_speed: u8 = 23;
     //
-    let mut max_speed: HashMap<String, u8> = HashMap::new();
+    let mut max_speed = HashMap::new();
     max_speed.insert(highway.to_owned(), highway_speed);
     //
     let default_walking_speed: u8 = 12;
@@ -224,5 +226,5 @@ fn create_config() -> (osm_parse_config::OSMParseConfig, String, u8, u8) {
     let config =
         osm_parse_config::OSMParseConfig::new(HashMap::new(), max_speed, default_walking_speed);
 
-    return (config, highway, highway_speed, default_walking_speed);
+    return (config, String::from(highway), highway_speed, default_walking_speed);
 }

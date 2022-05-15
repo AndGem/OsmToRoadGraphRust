@@ -7,6 +7,7 @@ extern crate yaml_rust;
 #[macro_use]
 extern crate galvanic_assert;
 
+extern crate smartstring;
 use clap::App;
 use lcc::compute_lcc;
 use network_type::{get_network_type, NetworkType};
@@ -66,7 +67,7 @@ fn main() {
 
     //process
     let in_filename = arg_matches.value_of("input").unwrap();
-    let (nodes, ways) = osm_reader::read_osm(&in_filename.to_owned(), &config);
+    let (nodes, ways) = osm_reader::read_osm(in_filename, &config);
     let graph = osm_convert::convert(nodes, ways, &config);
     compute_lcc(&graph);
 
